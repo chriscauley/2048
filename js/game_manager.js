@@ -8,6 +8,7 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
 
   this.inputManager.on("move", this.move.bind(this));
   this.inputManager.on("restart", this.restart.bind(this));
+  this.inputManager.on("revertCheckPoint", this.revertCheckPoint.bind(this));
   this.inputManager.on("keepPlaying", this.keepPlaying.bind(this));
 
   this.setup();
@@ -16,8 +17,16 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
 // Restart the game
 GameManager.prototype.restart = function () {
   this.storageManager.clearGameState();
+  this.storageManager.clearGameState(this.storageManager.checkPointKey);
   this.actuator.continueGame(); // Clear the game won/lost message
   this.setup();
+};
+
+// Restart the game
+GameManager.prototype.revertCheckPoint = function () {
+  this.storageManager.clearGameState();
+  this.actuator.continueGame(); // Clear the game won/lost message
+  this.setup(this.storageManager.checkPointKey);
 };
 
 // Keep playing after winning (allows going over 2048)
@@ -36,9 +45,8 @@ GameManager.prototype.isGameTerminated = function () {
 };
 
 // Set up the game
-GameManager.prototype.setup = function () {
-  var previousState = this.storageManager.getGameState();
-
+GameManager.prototype.setup = function (key) {
+  var previousState = this.storageManager.getGameState(key);
   // Reload the game from a previous game if present
   if (previousState) {
     this.grid        = new Grid(previousState.grid.size,
@@ -171,7 +179,10 @@ GameManager.prototype.move = function (direction) {
           self.score += merged.value;
 
           // The mighty 2048 tile
-          if (merged.value === 2048) self.won = true;
+          if (merged.value === 2048) { self.won = true; }
+          if (merged.value > 255) {
+            self.storageManager.setGameState(self.serialize(),self.storageManager.checkPointKey);
+          }
         } else {
           self.moveTile(tile, positions.farthest);
         }
