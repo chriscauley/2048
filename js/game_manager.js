@@ -17,7 +17,6 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
 // Restart the game
 GameManager.prototype.restart = function () {
   this.storageManager.clearGameState();
-  this.storageManager.clearGameState(this.storageManager.checkPointKey);
   this.actuator.continueGame(); // Clear the game won/lost message
   this.setup();
 };
@@ -153,7 +152,7 @@ GameManager.prototype.move = function (direction) {
 
   // Save the current tile positions and remove merger information
   this.prepareTiles();
-
+  this.autoCheckPoint = false;
   // Traverse the grid in the right direction and move tiles
   traversals.x.forEach(function (x) {
     traversals.y.forEach(function (y) {
@@ -181,7 +180,8 @@ GameManager.prototype.move = function (direction) {
           // The mighty 2048 tile
           if (merged.value === 2048) { self.won = true; }
           if (merged.value > 255) {
-            self.storageManager.setGameState(self.serialize(),self.storageManager.checkPointKey);
+            console.log(merged)
+            self.autoCheckPoint = true;
           }
         } else {
           self.moveTile(tile, positions.farthest);
@@ -193,7 +193,6 @@ GameManager.prototype.move = function (direction) {
       }
     });
   });
-
   if (moved) {
     this.addRandomTile();
 
@@ -201,6 +200,10 @@ GameManager.prototype.move = function (direction) {
       this.over = true; // Game over!
     }
 
+    if (this.autoCheckPoint) {
+      console.log('checkpoint saved')
+      self.storageManager.setGameState(self.serialize(),self.storageManager.checkPointKey);
+    }
     this.actuate();
   }
 };
