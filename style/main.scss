@@ -461,7 +461,7 @@ hr {
   margin-bottom: 0;
 }
 
-.restart-button, .revert-checkpoint {
+.restart-button, .revert-autosave {
   @include button;
   display: block;
   text-align: center;

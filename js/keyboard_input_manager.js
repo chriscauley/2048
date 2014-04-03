@@ -71,8 +71,8 @@ KeyboardInputManager.prototype.listen = function () {
   // Respond to button presses
   this.bindButtonPress(".retry-button", this.restart);
   this.bindButtonPress(".restart-button", this.restart);
-  this.bindButtonPress(".revert-checkpoint", this.revertCheckPoint);
-  this.bindButtonPress(".load-checkpoint", this.revertCheckPoint);
+  this.bindButtonPress(".revert-autosave", this.loadAutoSave);
+  this.bindButtonPress(".load-autosave", this.loadAutoSave);
   this.bindButtonPress(".keep-playing-button", this.keepPlaying);
 
   // Respond to swipe events
@@ -134,9 +134,9 @@ KeyboardInputManager.prototype.restart = function (event) {
   this.emit("restart");
 };
 
-KeyboardInputManager.prototype.revertCheckPoint = function (event) {
+KeyboardInputManager.prototype.loadAutoSave = function (event) {
   event.preventDefault();
-  this.emit("revertCheckPoint");
+  this.emit("loadAutoSave");
 };
 
 KeyboardInputManager.prototype.keepPlaying = function (event) {

@@ -8,7 +8,7 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
 
   this.inputManager.on("move", this.move.bind(this));
   this.inputManager.on("restart", this.restart.bind(this));
-  this.inputManager.on("revertCheckPoint", this.revertCheckPoint.bind(this));
+  this.inputManager.on("loadAutoSave", this.loadAutoSave.bind(this));
   this.inputManager.on("keepPlaying", this.keepPlaying.bind(this));
 
   this.setup();
@@ -21,11 +21,11 @@ GameManager.prototype.restart = function () {
   this.setup();
 };
 
-// Restart the game
-GameManager.prototype.revertCheckPoint = function () {
+// Load the checkpoint
+GameManager.prototype.loadAutoSave = function () {
   this.storageManager.clearGameState();
   this.actuator.continueGame(); // Clear the game won/lost message
-  this.setup(this.storageManager.checkPointKey);
+  this.setup("autosave");
 };
 
 // Keep playing after winning (allows going over 2048)
@@ -152,7 +152,7 @@ GameManager.prototype.move = function (direction) {
 
   // Save the current tile positions and remove merger information
   this.prepareTiles();
-  this.autoCheckPoint = false;
+  this.autoSave = false;
   // Traverse the grid in the right direction and move tiles
   traversals.x.forEach(function (x) {
     traversals.y.forEach(function (y) {
@@ -181,7 +181,7 @@ GameManager.prototype.move = function (direction) {
           if (merged.value === 2048) { self.won = true; }
           if (merged.value > 255) {
             console.log(merged)
-            self.autoCheckPoint = true;
+            self.autoSave = true;
           }
         } else {
           self.moveTile(tile, positions.farthest);
@@ -200,13 +200,15 @@ GameManager.prototype.move = function (direction) {
       this.over = true; // Game over!
     }
 
-    if (this.autoCheckPoint) {
-      console.log('checkpoint saved')
-      self.storageManager.setGameState(self.serialize(),self.storageManager.checkPointKey);
+    if (this.autoSave) {
+      this.storageManager.setGameState(this.serialize(),"autosave");
     }
     this.actuate();
   }
 };
+GameManager.prototype.manuSave = function() {
+  this.storageManager.setGameState(this.serialize(),"manusave");
+}
 
 // Get the vector representing the chosen direction
 GameManager.prototype.getVector = function (direction) {
