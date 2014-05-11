@@ -73,6 +73,9 @@ KeyboardInputManager.prototype.listen = function () {
   this.bindButtonPress(".restart-button", this.restart);
   this.bindButtonPress(".revert-autosave", this.loadAutoSave);
   this.bindButtonPress(".load-autosave", this.loadAutoSave);
+  this.bindButtonPress(".load-manusave", this.loadManuSave);
+  this.bindButtonPress(".load-game", this.loadManuSave);
+  this.bindButtonPress(".save-game", this.manuSave);
   this.bindButtonPress(".keep-playing-button", this.keepPlaying);
 
   // Respond to swipe events
@@ -137,6 +140,16 @@ KeyboardInputManager.prototype.restart = function (event) {
 KeyboardInputManager.prototype.loadAutoSave = function (event) {
   event.preventDefault();
   this.emit("loadAutoSave");
+};
+
+KeyboardInputManager.prototype.loadManuSave = function (event) {
+  event.preventDefault();
+  this.emit("loadManuSave");
+};
+
+KeyboardInputManager.prototype.manuSave = function (event) {
+  event.preventDefault();
+  this.emit("manuSave");
 };
 
 KeyboardInputManager.prototype.keepPlaying = function (event) {

@@ -461,11 +461,12 @@ hr {
   margin-bottom: 0;
 }
 
-.restart-button, .revert-autosave {
+.restart-button, .revert-autosave, .load-game, .save-game {
   @include button;
   display: block;
   text-align: center;
   float: right;
+  margin-right: 5px;
 }
 
 .game-explanation {

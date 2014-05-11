@@ -9,6 +9,8 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
   this.inputManager.on("move", this.move.bind(this));
   this.inputManager.on("restart", this.restart.bind(this));
   this.inputManager.on("loadAutoSave", this.loadAutoSave.bind(this));
+  this.inputManager.on("loadManuSave", this.loadManuSave.bind(this));
+  this.inputManager.on("manuSave", this.manuSave.bind(this));
   this.inputManager.on("keepPlaying", this.keepPlaying.bind(this));
 
   this.setup();
@@ -27,6 +29,17 @@ GameManager.prototype.loadAutoSave = function () {
   this.actuator.continueGame(); // Clear the game won/lost message
   this.setup("autosave");
 };
+
+// Load the saved Game
+GameManager.prototype.loadManuSave = function () {
+  this.storageManager.clearGameState();
+  this.actuator.continueGame(); // Clear the game won/lost message
+  this.setup("manusave");
+};
+
+GameManager.prototype.manuSave = function () {
+  this.storageManager.setGameState(this.serialize(),"manusave");
+}
 
 // Keep playing after winning (allows going over 2048)
 GameManager.prototype.keepPlaying = function () {
@@ -180,7 +193,6 @@ GameManager.prototype.move = function (direction) {
           // The mighty 2048 tile
           if (merged.value === 2048) { self.won = true; }
           if (merged.value > 255) {
-            console.log(merged)
             self.autoSave = true;
           }
         } else {
@@ -206,9 +218,6 @@ GameManager.prototype.move = function (direction) {
     this.actuate();
   }
 };
-GameManager.prototype.manuSave = function() {
-  this.storageManager.setGameState(this.serialize(),"manusave");
-}
 
 // Get the vector representing the chosen direction
 GameManager.prototype.getVector = function (direction) {
